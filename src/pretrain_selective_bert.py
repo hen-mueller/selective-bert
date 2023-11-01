@@ -41,9 +41,7 @@ def main():
     ap.add_argument('--save_dir', default='out', help='Directory for logs, checkpoints and predictions')
     ap.add_argument('--random_seed', type=int, default=123, help='Random seed')
     ap.add_argument('--load_weights', help='Load pre-trained weights before training')
-    #ap.add_argument('--test', action='store_true', help='Test the model after training')
 
-    #ap.add_argument('--base', action='store_true', help='Use the default BERT model')
     ap.add_argument('--init_bert', action='store_true', help='Initialize the BERT model from huggingface')
     ap.add_argument('--continue_ckpt', help='Path to checkpoint of pretrained BertForPreTraining model')
 
@@ -79,10 +77,7 @@ def main():
         del reference
         torch.cuda.empty_cache()
 
-    #if not args.continue_ckpt:
     model_checkpoint = ModelCheckpoint(monitor='val_epoch', mode='max', save_top_k=args.save_top_k, verbose=True)
-    #else:
-    #    model_checkpoint = ModelCheckpoint(monitor='val_epoch', mode='max', save_top_k=args.save_top_k, verbose=True, dirpath=args.continue_ckpt)
 
     if not args.continue_ckpt:
         trainer = Trainer.from_argparse_args(args, deterministic=True,

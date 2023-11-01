@@ -107,7 +107,6 @@ class SelectiveBertForPreTraining(LightningModule):
         if self.val_ds is None:
             sampler = DistributedSampler(self.train_ds.select(range(self.batch_size)))
             return DataLoader(self.train_ds.select(range(self.batch_size)), batch_size=self.batch_size, sampler=sampler, shuffle=False, num_workers=self.num_workers, collate_fn=self.collator)
-            #return None
 
         if self.uses_ddp:
             sampler = DistributedSampler(self.val_ds)
@@ -209,7 +208,6 @@ class SelectiveBertForPreTraining(LightningModule):
         t1 = time.time()
         runtime = torch.as_tensor(t1 - t0, device=self.device)
 
-        #outputs = (prediction_scores, seq_relationship_score)
         return outputs, labels, next_sentence_label, runtime
 
     def validation_epoch_end(self, val_results: List[Tuple[torch.Tensor]]):

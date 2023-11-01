@@ -50,14 +50,10 @@ class HFDatasetForNextSentencePrediction(Dataset):
         self.tokenizer = tokenizer
 
         if split_type == 'train':
-            #wiki = load_dataset("wikipedia", "20200501.en", split="train[:90%]")
             wiki = load_dataset("wikipedia", "20200501.en", split=f"train[:{split_perc}%]")
-            #bookcorpus = load_dataset("bookcorpusopen", split="train[:90%]")
             bookcorpus = load_dataset("bookcorpusopen", split=f"train[:{split_perc}%]")
         elif split_type == 'val':
-            #wiki = load_dataset("wikipedia", "20200501.en", split="train[90%:95%]")
             wiki = load_dataset("wikipedia", "20200501.en", split=f"train[{split_perc}%:]")
-            #bookcorpus = load_dataset("bookcorpusopen", split="train[90%:95%]")
             bookcorpus = load_dataset("bookcorpusopen", split=f"train[{split_perc}%:]")
 
         wiki.remove_columns_("title")
@@ -66,18 +62,11 @@ class HFDatasetForNextSentencePrediction(Dataset):
         #datasets.logging.set_verbosity_info() #for debugging
 
         print(f"Preparing the wikipedia dataset", file=sys.stderr)
-        wiki = wiki.map(lambda x: self.sentence_split(x), batched=True, num_proc=self.num_workers)#, writer_batch_size=100)#self.num_workers)
-        #print(len(wiki)) #5470580
-        #wiki = wiki.filter(lambda x: len(x['text']) > 1, num_proc=self.num_workers)
-        #print(len(wiki)) #5215554
+        wiki = wiki.map(lambda x: self.sentence_split(x), batched=True, num_proc=self.num_workers)
 
         print(f"Preparing the bookcorpus dataset", file=sys.stderr)
-        bookcorpus = bookcorpus.map(lambda x: self.sentence_split(x), batched=True, num_proc=self.num_workers, batch_size=50)#, writer_batch_size=100)#self.num_workers)
-        #print(len(bookcorpus)) #16081
-        #bookcorpus = bookcorpus.filter(lambda x: len(x['text']) > 1, num_proc=self.num_workers)
-        #print(len(bookcorpus)) #16079
+        bookcorpus = bookcorpus.map(lambda x: self.sentence_split(x), batched=True, num_proc=self.num_workers, batch_size=50)
 
-        #print(f"Concat datasets", file=sys.stderr)
         assert bookcorpus.features.type == wiki.features.type
         bert_dataset = concatenate_datasets([wiki, bookcorpus])
 
@@ -102,8 +91,6 @@ class HFDatasetForNextSentencePrediction(Dataset):
 
             sentence_list = list(filter(None, sentence_list))
             tokenized_list = [self.tokenizer.tokenize(sentence) for sentence in sentence_list]
-            #token_list = self.tokenizer.tokenize(sentence_list)#, add_special_tokens=False, return_token_type_ids=False, return_attention_mask=False)
-            #tokenized_list = token_list.data['input_ids']
         
             sentences['text'].append(tokenized_list)
         return sentences
@@ -251,15 +238,6 @@ class PretrainingDataCollatorForLanguageModeling(DataCollatorForLanguageModeling
     def __call__(
         self, examples: List[Union[List[int], torch.Tensor, Dict[str, List[int]]]]
     ) -> Dict[str, torch.Tensor]:
-        # Handle dict or lists with proper padding and conversion to tensor.
-        # replace with inputs = tokenizer(queries_tokenized, docs_tokenized, padding=True, truncation=True)
-        
-        #if isinstance(examples[0], (dict, BatchEncoding)):
-        #    batch = self.tokenizer.pad(examples, return_tensors="pt")
-        #else:
-        #    batch = {"input_ids": _collate_batch(examples, self.tokenizer)}
-        #return_special_tokens_mask=True improves performance
-
         batch = {}
         tokens_a = [entry["tokens_a"] for entry in examples]
         tokens_b = [entry["tokens_b"] for entry in examples]
