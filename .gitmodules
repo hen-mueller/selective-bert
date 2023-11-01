@@ -1,0 +1,3 @@
+[submodule "src/qa-utils"]
+	path = src/qa-utils
+	url = https://github.com/mrjleo/qa-utils.git
