@@ -9,7 +9,7 @@ conda env create -f environment.yml
 ```
 python preprocess_pretrain.py DATA_DIR --num_workers 16
 ```
-Open-source replication of the original dataset used to train the BERT models. Cleaned and correctly formatted data will be saved in DATA_DIR for further use with out code base.
+Open-source replication of the original dataset used to train the selective BERT model. Cleaned and correctly formatted data will be saved in DATA_DIR for further use with out code base.
 See `python preprocess_pretrain.py -h` for additional information on the (hyper-)parameters.
 
 ## Training
